@@ -215,7 +215,6 @@ int main(int argc, char* argv[]) {
 
 
 	//second line
-	//std::pair<double, double>	data_recv = data_exchange(data, stat, ProcNum, ProcRank, N_PerProcess, 0);
 
 	//sending data
 	data_send(data, stat, ProcNum, ProcRank, N_PerProcess, 0);
@@ -239,7 +238,6 @@ int main(int argc, char* argv[]) {
 
 	//main part
 	for (int k = 2; k < K; ++k) {
-		//std::pair<double, double>	data_recv = data_exchange(data, stat, ProcNum, ProcRank, N_PerProcess, k - 1);
 
 		//sending data
 		data_send(data, stat, ProcNum, ProcRank, N_PerProcess, k - 1);
