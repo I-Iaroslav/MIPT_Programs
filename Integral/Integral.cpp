@@ -3,6 +3,7 @@
 #include <thread>
 #include <mutex>
 #include <ctime>
+#include <windows.h>
 #include "Semaphore.h"
 
 #define TO_MANY_TASKS 7 //количество тасков, при котором последующий сбрасывается в общий стек
@@ -166,7 +167,7 @@ void loop(double start_a, double start_b, double &result, int pid) {
             //обращаемся к глобальному стеку, пока он не даст задания
             while (!GS.pop(Bl_rec, im_waiting)) {
                 im_waiting = true;
-                //sleep?
+                Sleep(10);
             }
             im_waiting = false;
             //если был получен FakeBlock, значит все треды остались без заданий и пора завершить процесс
