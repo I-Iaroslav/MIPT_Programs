@@ -312,7 +312,7 @@ int main(int argc, char* argv[]) {
 
 		//сохраняем в файл
 		std::ofstream out;
-		char file_name[] = "C:\\Programs\\MPI_Parallel\\Lab1\\out.txt";
+		char file_name[] = "out.txt";
 		out.open(file_name);
 		for (int iy = 0; iy < K; ++iy) {
 			for (int ix = 0; ix < N; ++ix) {
@@ -354,7 +354,7 @@ int main(int argc, char* argv[]) {
 	//int norm = 2000;
 
 	std::ifstream fin;
-	fin.open("C:\\Programs\\MPI_Parallel\\Lab1\\out.txt");
+	fin.open("out.txt");
 	double buff;
 
 	for (int iy = 0; iy < SIZE_Y; ++iy) {
