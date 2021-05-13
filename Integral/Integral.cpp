@@ -28,7 +28,7 @@ struct Block {
     double f_a;
     double f_b;
 
-    double integral; //итнтеграл блока, подсчитанный метадом трапеций
+    double integral; //итнтеграл блока, подсчитанный методом трапеций
 
     Block() : a(0), b(0), f_a(0), f_b(0), integral(0) {}
     Block(double new_a, double new_b, double new_f_a, double new_f_b) : a(new_a), b(new_b), f_a(new_f_a), f_b(new_f_b) {
