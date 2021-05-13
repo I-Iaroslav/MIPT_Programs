@@ -18,9 +18,9 @@
 #define LIVE_TO_DEATH_MAX 3
 #define LIVE_TO_DEATH_MIN 2
 
-#define TIME 4000 //количество итераций
+#define TIME 4000 //ГЄГ®Г«ГЁГ·ГҐГ±ГІГўГ® ГЁГІГҐГ°Г Г¶ГЁГ©
 
-//функция для красивого вывода времени)
+//ГґГіГ­ГЄГ¶ГЁГї Г¤Г«Гї ГЄГ°Г Г±ГЁГўГ®ГЈГ® ГўГ»ГўГ®Г¤Г  ГўГ°ГҐГ¬ГҐГ­ГЁ)
 const std::string currentDateTime() {
 	time_t     now = time(NULL);
 	struct tm  tstruct;
@@ -48,7 +48,7 @@ void delete_matrix(T** matrix, int width) {
 }
 
 void print_map(bool ** map, int size_x, int size_y, HANDLE &hConsole, DWORD &dwBytesWritten) {
-	wchar_t* screen = new wchar_t[2 * size_x * size_y + 1]; // Массив для записи в буфер
+	wchar_t* screen = new wchar_t[2 * size_x * size_y + 1]; // ГЊГ Г±Г±ГЁГў Г¤Г«Гї Г§Г ГЇГЁГ±ГЁ Гў ГЎГіГґГҐГ°
 	
 	for (int ix = 0; ix < size_x; ++ix)
 		for (int iy = 0; iy < size_y; ++iy)
@@ -61,8 +61,8 @@ void print_map(bool ** map, int size_x, int size_y, HANDLE &hConsole, DWORD &dwB
 				screen[2 * (iy * size_x + ix) + 1] = short(' ');
 			}
 	
-	screen[2 * size_x * size_y] = '\0';  // Последний символ - окончание строки
-	WriteConsoleOutputCharacter(hConsole, screen, 2 * size_x * size_y, { 0, 0 }, &dwBytesWritten); // Запись в буфер
+	screen[2 * size_x * size_y] = '\0';  // ГЏГ®Г±Г«ГҐГ¤Г­ГЁГ© Г±ГЁГ¬ГўГ®Г« - Г®ГЄГ®Г­Г·Г Г­ГЁГҐ Г±ГІГ°Г®ГЄГЁ
+	WriteConsoleOutputCharacter(hConsole, screen, 2 * size_x * size_y, { 0, 0 }, &dwBytesWritten); // Г‡Г ГЇГЁГ±Гј Гў ГЎГіГґГҐГ°
 	
 	delete[] screen;
 }
@@ -88,7 +88,7 @@ void start_position(bool** map) {
 			map[ix][iy] = false;
 		}
 	}
-	//глайдер
+	//ГЈГ«Г Г©Г¤ГҐГ°
 	//map[3][3] = map[4][3] = map[5][3] = map[5][2] = map[4][1] = true; 
 	//Gosper gun
 	map[2][7] = map[2][8] = map[3][7] = map[3][8] = map[11][7] = map[12][6] = map[12][7] = map[12][8] = map[13][5] = map[13][6] = map[13][7] = map[13][8] = map[13][9] =
@@ -117,8 +117,8 @@ int main(int argc, char* argv[]) {
 	start_position(map);
 
 #ifdef DEMONSTRATION_MODE
-	HANDLE hConsole = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL); // Буфер экрана
-	SetConsoleActiveScreenBuffer(hConsole); // Настройка консоли
+	HANDLE hConsole = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL); // ГЃГіГґГҐГ° ГЅГЄГ°Г Г­Г 
+	SetConsoleActiveScreenBuffer(hConsole); // ГЌГ Г±ГІГ°Г®Г©ГЄГ  ГЄГ®Г­Г±Г®Г«ГЁ
 	DWORD dwBytesWritten = 0;
 
 	print_map(map, SCREEN_WIDTH, SCREEN_HEIGHT, hConsole, dwBytesWritten);
@@ -129,7 +129,7 @@ int main(int argc, char* argv[]) {
 	MPI_Comm_rank(MPI_COMM_WORLD, &ProcRank);
 	MPI_Comm_size(MPI_COMM_WORLD, &ProcNum);
 
-	//определяем, каким процессам достанется больше работы
+	//Г®ГЇГ°ГҐГ¤ГҐГ«ГїГҐГ¬, ГЄГ ГЄГЁГ¬ ГЇГ°Г®Г¶ГҐГ±Г±Г Г¬ Г¤Г®Г±ГІГ Г­ГҐГІГ±Гї ГЎГ®Г«ГјГёГҐ Г°Г ГЎГ®ГІГ»
 	column_per_process = SCREEN_WIDTH / ProcNum;
 	column_add = SCREEN_WIDTH % ProcNum;
 
@@ -268,7 +268,7 @@ int main(int argc, char* argv[]) {
 				reviving_data[iy * column_per_process + ix] = proc_map[ix + 1][iy + 1];
 
 
-		MPI_Send(&column_per_process, sizeof(column_per_process), MPI_BYTE, 0, 1, MPI_COMM_WORLD); //у процессов мб разное колличество обрабатываемых столбцов, поэтому передаем их количество
+		MPI_Send(&column_per_process, sizeof(column_per_process), MPI_BYTE, 0, 1, MPI_COMM_WORLD); //Гі ГЇГ°Г®Г¶ГҐГ±Г±Г®Гў Г¬ГЎ Г°Г Г§Г­Г®ГҐ ГЄГ®Г«Г«ГЁГ·ГҐГ±ГІГўГ® Г®ГЎГ°Г ГЎГ ГІГ»ГўГ ГҐГ¬Г»Гµ Г±ГІГ®Г«ГЎГ¶Г®Гў, ГЇГ®ГЅГІГ®Г¬Гі ГЇГҐГ°ГҐГ¤Г ГҐГ¬ ГЁГµ ГЄГ®Г«ГЁГ·ГҐГ±ГІГўГ®
 		MPI_Send(&FirstX, sizeof(FirstX), MPI_BYTE, 0, 1, MPI_COMM_WORLD);
 		MPI_Send(reviving_data, column_per_process *  SCREEN_HEIGHT * sizeof(bool), MPI_BYTE, 0, 1, MPI_COMM_WORLD);
 
@@ -282,8 +282,8 @@ int main(int argc, char* argv[]) {
 
 
 		for (int i = 1; i < ProcNum; ++i) {
-			//принимаем у каждого процесса данные
-			int rec_column_PerProcess;//колличество обрабатываемых столбцов у процесса, который нам пересылает данные
+			//ГЇГ°ГЁГ­ГЁГ¬Г ГҐГ¬ Гі ГЄГ Г¦Г¤Г®ГЈГ® ГЇГ°Г®Г¶ГҐГ±Г±Г  Г¤Г Г­Г­Г»ГҐ
+			int rec_column_PerProcess;//ГЄГ®Г«Г«ГЁГ·ГҐГ±ГІГўГ® Г®ГЎГ°Г ГЎГ ГІГ»ГўГ ГҐГ¬Г»Гµ Г±ГІГ®Г«ГЎГ¶Г®Гў Гі ГЇГ°Г®Г¶ГҐГ±Г±Г , ГЄГ®ГІГ®Г°Г»Г© Г­Г Г¬ ГЇГҐГ°ГҐГ±Г»Г«Г ГҐГІ Г¤Г Г­Г­Г»ГҐ
 			MPI_Recv(&rec_column_PerProcess, sizeof(rec_column_PerProcess), MPI_BYTE, i, 1, MPI_COMM_WORLD, &stat);
 
 			int proc_FirstX;
@@ -322,6 +322,7 @@ int main(int argc, char* argv[]) {
 		std::cout << "[" << currentDateTime() << "] ";
 		std::cout << "From process " << ProcRank << ": data saved in file: " << file_name << std::endl;
 	}
+	
 #endif
 
 	delete_matrix<bool>(proc_map, column_per_process + 2);
