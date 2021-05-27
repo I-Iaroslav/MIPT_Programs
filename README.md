@@ -6,4 +6,4 @@
 
 Parallel - парпрога 6 семестр
 
-Acronis-Parallel - базовая парпрога 6 сместр
+Acronis-Parallel - базовая парпрога 6 семестр
