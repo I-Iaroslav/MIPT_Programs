@@ -18,7 +18,7 @@ int main()
     std::cout << "Main thread: x = " << x << ", y = " << y << std::endl;
 
 
-#pragma omp parallel num_threads(4) copyin(y)
+#pragma omp parallel num_threads(THREADS) copyin(y)
     {
 
         int thread_num = omp_get_thread_num();
