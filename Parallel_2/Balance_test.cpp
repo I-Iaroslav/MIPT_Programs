@@ -17,7 +17,7 @@ int main()
     int N = 65;
 
 
-#pragma omp parallel num_threads(4)
+#pragma omp parallel num_threads(THREADS)
     {
         int thread_num = omp_get_thread_num();
 
