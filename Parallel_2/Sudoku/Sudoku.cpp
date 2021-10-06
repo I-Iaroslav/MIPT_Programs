@@ -3,7 +3,10 @@
 #include <fstream>
 #include <omp.h>
 #include <vector>
+#include <mutex>
 
+bool JOB_IS_DONE_FOR_ALL = false;
+std::mutex MUT;
 
 void print_field(int LEVEL, std::vector<std::vector<int>>& game_field) {
     int LEVEL_2 = LEVEL * LEVEL;
@@ -198,7 +201,7 @@ int solve_sudoku(int LEVEL, std::vector<std::vector<int>>& game_field) {
                 if (possibles[i] == false) {
 
 //добовляем следующий блок в стек задач
-#pragma omp task firstprivate(i, min_cell) shared(game_field, result)
+#pragma omp task firstprivate(i, min_cell) shared(JOB_IS_DONE, game_field, result)
 {
                     //делаем копию поля и добавляем в нее предполагаемое значение выбранной клетки
                     std::vector<std::vector<int>> game_field_copy(LEVEL_2);
@@ -208,8 +211,12 @@ int solve_sudoku(int LEVEL, std::vector<std::vector<int>>& game_field) {
                     
                     if(JOB_IS_DONE == false) {
                         if (solve_sudoku(LEVEL, game_field_copy) == 0) { //решили
+                            MUT.lock();
+                            JOB_IS_DONE = true;
                             game_field = game_field_copy;
                             result = 0;
+                            //print_field(LEVEL, game_field);
+                            MUT.unlock();
                         }
                     }
 }
