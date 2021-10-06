@@ -91,6 +91,7 @@ void find_possible_values(int LEVEL, std::vector<std::vector<int>>& game_field, 
     }
 }
 
+    bool PLEASE_STOP = false;
 
 //возврощает 0 если решение найдено, 1 если решние невозможно
 int solve_sudoku(int LEVEL, std::vector<std::vector<int>>& game_field) {
@@ -189,15 +190,13 @@ int solve_sudoku(int LEVEL, std::vector<std::vector<int>>& game_field) {
             std::vector<bool> possibles(LEVEL_2 + 1, false);
             find_possible_values(LEVEL, game_field, is_known, possibles, min_cell.first);
 
-            int result = 1;
-
 
             //пробегаем по всем возможным значениям
             for (int i = 1; i < LEVEL_2 + 1; ++i) {
                 if (possibles[i] == false) {
 
 //добовляем следующий блок в стек задач
-#pragma omp task firstprivate(i, min_cell) shared(JOB_IS_DONE, game_field, result)
+#pragma omp task firstprivate(i, min_cell) shared(JOB_IS_DONE, game_field)
 {
                     //делаем копию поля и добавляем в нее предполагаемое значение выбранной клетки
                     std::vector<std::vector<int>> game_field_copy(LEVEL_2);
@@ -205,11 +204,11 @@ int solve_sudoku(int LEVEL, std::vector<std::vector<int>>& game_field) {
                     game_field_copy = game_field;
                     game_field_copy[min_cell.first / LEVEL_2][min_cell.first % LEVEL_2] = i;
                     
-                    if(JOB_IS_DONE == false) {
+                    if(JOB_IS_DONE == false && PLEASE_STOP == false) {
                         if (solve_sudoku(LEVEL, game_field_copy) == 0) { //решили
+                            PLEASE_STOP = true;
                             JOB_IS_DONE = true;
                             game_field = game_field_copy;
-                            result = 0;
                             //print_field(LEVEL, game_field);
                         }
                     }
@@ -221,7 +220,7 @@ int solve_sudoku(int LEVEL, std::vector<std::vector<int>>& game_field) {
 #pragma omp taskwait
 
             //из блока omp task нельзя выйти с помощью return, поэтому используем костыль
-            if(result == 0) { return 0; }
+            if(JOB_IS_DONE == true) { return 0; }
             //если все предположенные значения не привели к положительному результату, решения нет
             return 1;
         }
@@ -240,7 +239,7 @@ int main() {
 
     std::vector<std::vector<int>> game_field;                       // матрица значений игрового поля, 0 - пустая клетка
 
-    std::string file_name = "Sudoku_5_2.txt";
+    std::string file_name = "Sudoku_4_e.txt";
 
     read_matrix(file_name, LEVEL, game_field);
     LEVEL_2 = LEVEL * LEVEL;
