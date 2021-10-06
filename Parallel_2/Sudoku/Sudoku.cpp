@@ -247,9 +247,9 @@ int main() {
 
     print_field(LEVEL, game_field);
 
-    int time_d = 0;
-    int time_end = 0;
-    int time_start = 0;
+    double time_d = 0;
+    double time_end = 0;
+    double time_start = 0;
 	time_start = omp_get_wtime();
 
 #pragma omp parallel
