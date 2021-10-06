@@ -3,9 +3,6 @@
 #include <fstream>
 #include <omp.h>
 #include <vector>
-#include <mutex>
-
-std::mutex MUT;
 
 void print_field(int LEVEL, std::vector<std::vector<int>>& game_field) {
     int LEVEL_2 = LEVEL * LEVEL;
@@ -210,12 +207,10 @@ int solve_sudoku(int LEVEL, std::vector<std::vector<int>>& game_field) {
                     
                     if(JOB_IS_DONE == false) {
                         if (solve_sudoku(LEVEL, game_field_copy) == 0) { //решили
-                            MUT.lock();
                             JOB_IS_DONE = true;
                             game_field = game_field_copy;
                             result = 0;
                             //print_field(LEVEL, game_field);
-                            MUT.unlock();
                         }
                     }
 }
