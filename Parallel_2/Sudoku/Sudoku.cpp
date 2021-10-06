@@ -4,7 +4,6 @@
 #include <omp.h>
 #include <vector>
 
-bool JOB_IS_DONE_FOR_ALL = false;
 
 void print_field(int LEVEL, std::vector<std::vector<int>>& game_field) {
     int LEVEL_2 = LEVEL * LEVEL;
