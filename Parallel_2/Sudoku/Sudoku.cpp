@@ -5,7 +5,6 @@
 #include <vector>
 #include <mutex>
 
-bool JOB_IS_DONE_FOR_ALL = false;
 std::mutex MUT;
 
 void print_field(int LEVEL, std::vector<std::vector<int>>& game_field) {
