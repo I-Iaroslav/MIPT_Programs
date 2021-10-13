@@ -184,66 +184,66 @@ int** Strassen_multiply(int size, int** A, int** B, int** C) {
 	
 		#pragma omp task shared(P_1)
 		{	
-            int** Buff_1 = new_matrix<int>(next_size, next_size);
-		    int** Buff_2 = new_matrix<int>(next_size, next_size);
+            		int** Buff_1 = new_matrix<int>(next_size, next_size);
+			int** Buff_2 = new_matrix<int>(next_size, next_size);
 			generate_matrix(P_1, next_size, next_size, true);
 			P_1 = Strassen_multiply(next_size, matrix_summation(next_size, A_11, A_22, Buff_1, false), matrix_summation(next_size, B_11, B_22, Buff_2, false), P_1); 
-            delete_matrix<int>(Buff_1, next_size);
-            delete_matrix<int>(Buff_2, next_size);
+            		delete_matrix<int>(Buff_1, next_size);
+            		delete_matrix<int>(Buff_2, next_size);
 		}
 		#pragma omp task  shared(P_2)
 		{
-            int** Buff_1 = new_matrix<int>(next_size, next_size);
-		    int** Buff_2 = new_matrix<int>(next_size, next_size);
-            generate_matrix(P_2, next_size, next_size, true);
+            		int** Buff_1 = new_matrix<int>(next_size, next_size);
+			int** Buff_2 = new_matrix<int>(next_size, next_size);
+            		generate_matrix(P_2, next_size, next_size, true);
 			P_2 = Strassen_multiply(next_size, matrix_summation(next_size, A_21, A_22, Buff_1, false), B_11, P_2);
-            delete_matrix<int>(Buff_1, next_size);
-            delete_matrix<int>(Buff_2, next_size);
+            		delete_matrix<int>(Buff_1, next_size);
+            		delete_matrix<int>(Buff_2, next_size);
 		}
 		#pragma omp task  shared(P_3)
 		{
-            int** Buff_1 = new_matrix<int>(next_size, next_size);
-		    int** Buff_2 = new_matrix<int>(next_size, next_size);
-    		generate_matrix(P_3, next_size, next_size, true);
+            		int** Buff_1 = new_matrix<int>(next_size, next_size);
+			int** Buff_2 = new_matrix<int>(next_size, next_size);
+    			generate_matrix(P_3, next_size, next_size, true);
 			P_3 = Strassen_multiply(next_size, A_11, matrix_summation(next_size, B_12, B_22, Buff_1, true), P_3);
-            delete_matrix<int>(Buff_1, next_size);
-            delete_matrix<int>(Buff_2, next_size);
+            		delete_matrix<int>(Buff_1, next_size);
+            		delete_matrix<int>(Buff_2, next_size);
 		}
 		#pragma omp task  shared(P_4)
 		{
-            int** Buff_1 = new_matrix<int>(next_size, next_size);
-		    int** Buff_2 = new_matrix<int>(next_size, next_size);
-    		generate_matrix(P_4, next_size, next_size, true);
+            		int** Buff_1 = new_matrix<int>(next_size, next_size);
+			int** Buff_2 = new_matrix<int>(next_size, next_size);
+    			generate_matrix(P_4, next_size, next_size, true);
 			P_4 = Strassen_multiply(next_size, A_22, matrix_summation(next_size, B_21, B_11, Buff_1, true), P_4);
-            delete_matrix<int>(Buff_1, next_size);
-            delete_matrix<int>(Buff_2, next_size);
+            		delete_matrix<int>(Buff_1, next_size);
+            		delete_matrix<int>(Buff_2, next_size);
 		}
 		#pragma omp task  shared(P_5)
 		{
-            int** Buff_1 = new_matrix<int>(next_size, next_size);
-		    int** Buff_2 = new_matrix<int>(next_size, next_size);
-    		generate_matrix(P_5, next_size, next_size, true);
+            		int** Buff_1 = new_matrix<int>(next_size, next_size);
+			int** Buff_2 = new_matrix<int>(next_size, next_size);
+    			generate_matrix(P_5, next_size, next_size, true);
 			P_5 = Strassen_multiply(next_size, matrix_summation(next_size, A_11, A_12, Buff_1, false), B_22, P_5);
-            delete_matrix<int>(Buff_1, next_size);
-            delete_matrix<int>(Buff_2, next_size);
+            		delete_matrix<int>(Buff_1, next_size);
+            		delete_matrix<int>(Buff_2, next_size);
 		}
 		#pragma omp task  shared(P_6)
 		{
-            int** Buff_1 = new_matrix<int>(next_size, next_size);
-		    int** Buff_2 = new_matrix<int>(next_size, next_size);
-    		generate_matrix(P_6, next_size, next_size, true);
+            		int** Buff_1 = new_matrix<int>(next_size, next_size);
+			int** Buff_2 = new_matrix<int>(next_size, next_size);
+    			generate_matrix(P_6, next_size, next_size, true);
 			P_6 = Strassen_multiply(next_size, matrix_summation(next_size, A_21, A_11, Buff_1, true), matrix_summation(next_size, B_11, B_12, Buff_2, false), P_6);
-            delete_matrix<int>(Buff_1, next_size);
-            delete_matrix<int>(Buff_2, next_size);
+            		delete_matrix<int>(Buff_1, next_size);
+            		delete_matrix<int>(Buff_2, next_size);
 		}
 		#pragma omp task  shared(P_7)
 		{
-            int** Buff_1 = new_matrix<int>(next_size, next_size);
-		    int** Buff_2 = new_matrix<int>(next_size, next_size);
-    		generate_matrix(P_7, next_size, next_size, true);
+            		int** Buff_1 = new_matrix<int>(next_size, next_size);
+			int** Buff_2 = new_matrix<int>(next_size, next_size);
+    			generate_matrix(P_7, next_size, next_size, true);
 			P_7 = Strassen_multiply(next_size, matrix_summation(next_size, A_12, A_22, Buff_1, true), matrix_summation(next_size, B_21, B_22, Buff_2, false), P_7);
-            delete_matrix<int>(Buff_1, next_size);
-            delete_matrix<int>(Buff_2, next_size);
+            		delete_matrix<int>(Buff_1, next_size);
+            		delete_matrix<int>(Buff_2, next_size);
 		}
 
 		#pragma omp taskwait
@@ -259,12 +259,12 @@ int** Strassen_multiply(int size, int** A, int** B, int** C) {
         delete_matrix<int>(B_22, next_size);
 
         int** Buff_1 = new_matrix<int>(next_size, next_size);
-		int** Buff_2 = new_matrix<int>(next_size, next_size);
-
-		C_11 = matrix_summation(next_size, matrix_summation(next_size, P_1, P_7, Buff_1, false), matrix_summation(next_size, P_4, P_5, Buff_2, true), C_11, false);
-		C_12 = matrix_summation(next_size, P_3, P_5, C_12, false);
-		C_21 = matrix_summation(next_size, P_2, P_4, C_21, false);
-		C_22 = matrix_summation(next_size, matrix_summation(next_size, P_1, P_2, Buff_1, true), matrix_summation(next_size, P_3, P_6, Buff_2, false), C_22, false);
+	int** Buff_2 = new_matrix<int>(next_size, next_size);
+		
+	C_11 = matrix_summation(next_size, matrix_summation(next_size, P_1, P_7, Buff_1, false), matrix_summation(next_size, P_4, P_5, Buff_2, true), C_11, false);
+	C_12 = matrix_summation(next_size, P_3, P_5, C_12, false);
+	C_21 = matrix_summation(next_size, P_2, P_4, C_21, false);
+	C_22 = matrix_summation(next_size, matrix_summation(next_size, P_1, P_2, Buff_1, true), matrix_summation(next_size, P_3, P_6, Buff_2, false), C_22, false);
 
         delete_matrix<int>(Buff_1, next_size);
         delete_matrix<int>(Buff_2, next_size);
@@ -277,7 +277,7 @@ int** Strassen_multiply(int size, int** A, int** B, int** C) {
         delete_matrix<int>(P_6, next_size);
         delete_matrix<int>(P_7, next_size);
 
-		collect_matrix(size, C, C_11, C_12, C_21, C_22);
+	collect_matrix(size, C, C_11, C_12, C_21, C_22);
 
         delete_matrix<int>(C_11, next_size);
         delete_matrix<int>(C_12, next_size);
