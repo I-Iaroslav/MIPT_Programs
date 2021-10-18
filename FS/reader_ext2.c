@@ -71,8 +71,27 @@ int main() {
     printf("block_group: %d, local_inode_index %d\n",block_group,  local_inode_index);
 
 
+    //смотрим, есть ли в выбранной группе копия суперблока
+    int shift = 0;
+    int x = block_group;
+    if(block_group == 1 || block_group == 0) { shift = 2; }
+    while(x % 3 == 0) {
+        x = x / 3;
+        if(x == 1) { shift = 2; }
+    }
+    while(x % 5 == 0) {
+        x = x / 3;
+        if(x == 1) { shift = 2; }
+    }
+    while(x % 7 == 0) {
+        x = x / 3;
+        if(x == 1) { shift = 2; }
+    }
+
+
+
     lseek(fd, block_group * SB.blocks_per_group * SB.block_size 
-        + SB.block_size * 4 + 128 * local_inode_index 
+        + SB.block_size * (2 + shift) + 128 * local_inode_index 
         + 15 * SB.block_size , SEEK_SET);   //??????????
 
     read(fd, buff, sizeof(buff));
@@ -82,7 +101,7 @@ int main() {
     for(int i = 0; i < 15;++i) {
         char buff_c[4] = {buff[40+i*4], buff[41+i*4], buff[42+i*4], buff[43+i*4]};
         i_block[i] = *(int*) buff_c;    
-        printf("i_block[%d]: %d \n", i, i_block[i]);
+        //printf("i_block[%d]: %d \n", i, i_block[i]);
     }
 
 
@@ -94,12 +113,10 @@ int main() {
         else if(i < 12) {
             read_data_block(fd, i_block[i], buff, sizeof(buff));
             print_data_block(buff, sizeof(buff));
-            //printf("\n%d, \n", i);
         }
         //indirrect block
         else if(i == 12) {
             read_link_block(fd, i_block[i], 1);
-            //printf("\n%d, \n", i);
         }
         //doubly-inderrect block
         else if(i == 13) {
