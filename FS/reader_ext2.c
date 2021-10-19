@@ -4,12 +4,13 @@
 #include <fcntl.h>
 #include <stdint.h>
 
-#define I_MODE_FOLDER 16893 //значение i_mode соответсвующее директории, найдено экспериментальным путем
+#define I_MODE_FOLDER 16893 //значение i_mode соответсвующее директории
 
 struct Superblock {
     int block_size;
     int inodes_per_group;
     int blocks_per_group;
+    int bg_inode_table;
 } SB;
 
 struct Inode{
@@ -119,7 +120,7 @@ int main() {
 
     char block_size_c[4] = {buff[24], buff[25], buff[26], buff[27]};
     SB.block_size = 1024 << (*(int*) block_size_c);
-    printf("Block Size: %d \n", SB.block_size);
+    printf("block_size: %d \n", SB.block_size);
 
     char inodes_per_group_c[4] = {buff[40], buff[41], buff[42], buff[43]};
     SB.inodes_per_group = *(int*) inodes_per_group_c;
@@ -135,31 +136,43 @@ int main() {
     printf("block_group: %d, local_inode_index %d\n\n",block_group,  local_inode_index);
 
 
+    //читаем block group descriptor table
+    //если размер блока = 1кб, то block group descriptor table находится в 3 блоке, иначе во 2
+    if(SB.block_size > 1024) {
+        lseek(fd, SB.block_size, SEEK_SET);
+    }
+    else {
+        lseek(fd, SB.block_size * 2, SEEK_SET);
+    }
+    read(fd, buff, sizeof(buff));
+
+    char inode_table_c[4] = {buff[8], buff[9], buff[10], buff[11]};
+    SB.bg_inode_table = *(int*) inode_table_c;
+
     //смотрим, есть ли в выбранной группе копия суперблока
-    int shift = 0;
-    if(block_group == 1 || block_group == 0) { shift = 2; }
+    //если нет, необходимо отступить 2 блока от начала группы(пропускаем block bitmap и inode bitmap) 
+    //иначе смотрим на значение начала inode table, взятого из block group descriptor table
+    int shift = 2;
+    if(block_group == 1 || block_group == 0) { shift = SB.bg_inode_table; }
     int x = block_group;
     while(x % 3 == 0) {
         x = x / 3;
-        if(x == 1) { shift = 2; }
+        if(x == 1) { shift = SB.bg_inode_table; }
     }
     x = block_group;
     while(x % 5 == 0) {
         x = x / 3;
-        if(x == 1) { shift = 2; }
+        if(x == 1) { shift = SB.bg_inode_table; }
     }
     x = block_group;
     while(x % 7 == 0) {
         x = x / 3;
-        if(x == 1) { shift = 2; }
+        if(x == 1) { shift = SB.bg_inode_table; }
     }
 
 
     //читаем нужную иноду
-    lseek(fd, block_group * SB.blocks_per_group * SB.block_size 
-        + SB.block_size * (2 + shift) + 128 * local_inode_index 
-        + 15 * SB.block_size , SEEK_SET);   //??????????
-
+    lseek(fd, block_group * SB.blocks_per_group * SB.block_size + SB.block_size * shift + 128 * local_inode_index, SEEK_SET);  
     read(fd, buff, sizeof(buff));
 
 
