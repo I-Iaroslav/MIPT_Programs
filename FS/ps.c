@@ -28,6 +28,8 @@ int main(void) {
                 fscanf(f, "%d %s", &pid, proc_name);
 
                 printf("%-8d%s\n", pid, proc_name);
+
+                fclose(f);
             }
         }    
         closedir(d);
