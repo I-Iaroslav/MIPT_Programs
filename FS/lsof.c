@@ -11,7 +11,7 @@
 void check(char* message) {
     if(errno != 0) {
         printf("Error! %s fail!\n", message);
-        exit(1);
+        //exit(1);
     }
 }
 
@@ -27,7 +27,7 @@ int main(void) {
     
     char proc_dir[] = "/proc";
 
-    d = opendir("/proc");
+    d = opendir(proc_dir);
     check("opendir(/proc)");
 
     printf("PID      CMD              NAME\n");
@@ -53,7 +53,6 @@ int main(void) {
                 if(d_fd) {
                     while ((dir_fd = readdir(d_fd)) != NULL) {
                         check("opendir(d_fd)");
-
                         if(dir_fd->d_name[0] != '.') {
                             char buff[PATH_MAX];
                             char way[10 + sizeof(dir->d_name) + sizeof(dir_fd->d_name)];
@@ -73,7 +72,7 @@ int main(void) {
                 }
                 fclose(f_stat);
                 closedir(d_fd);
-
+                errno = 0;
             }
         }    
         closedir(d);
