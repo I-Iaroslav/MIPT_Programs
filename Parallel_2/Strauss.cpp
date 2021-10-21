@@ -305,7 +305,7 @@ int main() {
 	std::cout << "Calculations begin, cores: " << THREADS << std::endl;
 	time_start = omp_get_wtime();
 
-	#pragma omp parallel
+	#pragma omp parallel num_threads(THREADS)
 	{
 	#pragma omp single 
 		{
