@@ -11,7 +11,7 @@
 void check(char* message) {
     if(errno != 0) {
         printf("Error! %s fail!\n", message);
-        //exit(1);
+        exit(1);
     }
 }
 
