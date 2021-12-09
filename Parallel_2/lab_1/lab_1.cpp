@@ -214,7 +214,7 @@ void algorithm_2V(int ProcRank, int ProcNum, double** a, MPI_Status& stat) {
             sending_data[c - first_task] = a[i + shift][j];
         }
 
-        double* reciving_data = new double[lines * ISIZE];
+        double* reciving_data = new double[lines * JSIZE];
 
         if (ProcRank == 0) {
             int last_point = task_per_proc;
