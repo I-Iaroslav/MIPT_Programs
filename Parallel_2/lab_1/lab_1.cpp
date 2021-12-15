@@ -12,8 +12,8 @@
 #define SAVE_DATA
 
 
-#define ISIZE 10
-#define JSIZE 10
+#define ISIZE 1000
+#define JSIZE 1000
 
 
 void algorithm_0(int first_task, int last_task, double** a);
@@ -27,9 +27,9 @@ int main(int argc, char** argv) {
         a[i] = new double[JSIZE];
     }
 #ifdef VARIANT_1B
-    double** a_copy = new double* [ISIZE];       
+    double** a_copy = new double* [ISIZE];
     for (int i = 0; i < ISIZE; ++i) {
-        a_copy[i] = new double[JSIZE];         
+        a_copy[i] = new double[JSIZE];
     }
 #endif
 
@@ -89,6 +89,7 @@ int main(int argc, char** argv) {
                 reciving_data[last_point * JSIZE + ii] = buff[ii];
 
             last_point = last_point + task_per_proc_rec;
+            delete[] buff;
         }
 
         for (int ii = 1; ii < ProcNum; ++ii) {
@@ -110,6 +111,9 @@ int main(int argc, char** argv) {
 #endif
         }
     }
+
+    delete[] reciving_data;
+    delete[] sending_data;
 
     MPI_Barrier(MPI_COMM_WORLD);
 
@@ -138,7 +142,7 @@ int main(int argc, char** argv) {
 
 
 #ifdef SAVE_DATA
-        save(ProcRank, ProcNum, first_task, last_task, a, stat);
+    save(ProcRank, ProcNum, first_task, last_task, a, stat);
 #endif //SAVE_DATA
 
 
@@ -174,92 +178,88 @@ void algorithm_0(int first_task, int last_task, double** a) {
 
 //в этом варианте мы каждый раз ссылаемся на элемент, следующий после вычисляемого, следовательно нам нужна копия данных предыдущих вычислений
 //так как иначе при расспаралеливании мы можем изменить эти данные раньше, чем мы их успеем использовать
-void algorithm_1B(int ProcRank, int ProcNum,  int first_task, int last_task, double** a, double** a_copy) {
+void algorithm_1B(int ProcRank, int ProcNum, int first_task, int last_task, double** a, double** a_copy) {
 
     if (ProcRank == ProcNum - 1) { last_task -= 3; }
 
     for (int i = first_task; i < last_task; i++) {
         for (int j = 4; j < JSIZE; j++) {
-            a[i][j] = sin(0.00001 * a_copy[i + 3][j - 4]);      
+            a[i][j] = sin(0.00001 * a_copy[i + 3][j - 4]);
         }
     }
 }
 
-//в этом варианте мы каждый раз ссылаемся на элемент, находящийся перед вычисляемым, следовательно нам нужна барьерная синхронизация
-//так как иначе мы будем использовать еще не рассчитанные данные
 void algorithm_2V(int ProcRank, int ProcNum, double** a, MPI_Status& stat) {
-    //считаем 3 как один массив, и уже его параллелим между всеми исполнителями 
 
+    if (ProcNum == 1) {
+        int first_task = ProcRank + 3;
 
-    for (int i = 3; i < ISIZE; i += 3) {
-        int lines = 3;
-        if (ISIZE - i < 3) { lines = ISIZE - i; }
-
-        //распределяем задачи
-        int tasks_num = (JSIZE - 2) * lines;
-        int last_task, first_task;
-
-        first_task = (tasks_num / ProcNum) * ProcRank;
-        if (ProcRank + 1 == ProcNum) { last_task = tasks_num; }
-        else { last_task = (tasks_num / ProcNum) * (ProcRank + 1); }
-        int task_per_proc = last_task - first_task;
-
-        double* sending_data = new double[task_per_proc];
-
-
-        for (int c = first_task; c < last_task; c++) {
-            int j = c % (JSIZE - 2);
-            int shift = c / (JSIZE - 2);
-            a[i + shift][j] = sin(0.00001 * a[i + shift - 3][j + 2]);
-            sending_data[c - first_task] = a[i + shift][j];
-        }
-
-        double* reciving_data = new double[lines * JSIZE];
-
-        if (ProcRank == 0) {
-            int last_point = task_per_proc;
-
-            for (int ii = 0; ii < task_per_proc; ++ii)
-                reciving_data[ii] = sending_data[ii];
-            
-            for (int proc = 1; proc < ProcNum; ++proc) {
-                int task_per_proc_rec;
-                MPI_Recv(&task_per_proc_rec, sizeof(task_per_proc_rec), MPI_BYTE, proc, 1, MPI_COMM_WORLD, &stat);
-
-                double* buff = new double[task_per_proc_rec];
-                MPI_Recv(buff, task_per_proc_rec * sizeof(double), MPI_BYTE, proc, 1, MPI_COMM_WORLD, &stat);
-           
-                for (int ii = 0; ii < task_per_proc_rec; ++ii)
-                    reciving_data[last_point + ii] = buff[ii];
-
-                last_point = last_point + task_per_proc_rec;
+        for (int i = first_task; i < ISIZE; i++) {
+            for (int j = 0; j < JSIZE - 4; j++) {
+                a[i][j] = sin(0.00001 * a[i - 3][j + 4]);
             }
-
-            for (int ii = 1; ii < ProcNum; ++ii) {
-                MPI_Send(reciving_data, lines * ISIZE * sizeof(double), MPI_BYTE, ii, 1, MPI_COMM_WORLD);
-            }
-
-
-
         }
-        else {
-
-            MPI_Send(&task_per_proc, sizeof(task_per_proc), MPI_BYTE, 0, 1, MPI_COMM_WORLD);
-            MPI_Send(sending_data, task_per_proc * sizeof(double), MPI_BYTE, 0, 1, MPI_COMM_WORLD);
-
-            MPI_Recv(reciving_data, lines * ISIZE * sizeof(double), MPI_BYTE, 0, 1, MPI_COMM_WORLD, &stat);
-
-        }
-
-        for (int c = 0; c < tasks_num; c++) {
-            int j = c % (JSIZE - 2);
-            int shift = c / (JSIZE - 2);
-            a[i + shift][j] = reciving_data[c];
-        }
-
-        delete sending_data;
-        delete reciving_data;
+        return;
     }
+    else if (ProcNum != 3) {
+        std::cout << "Wrong process number" << std::endl;
+        exit(1);
+    }
+
+    int first_task = ProcRank + 3;
+    int task_per_proc = ISIZE;
+
+    double* sending_data = new double[ISIZE * JSIZE];
+
+
+    for (int i = 0; i < JSIZE; i++) {
+        for (int j = 0; j < JSIZE; j++) {
+            sending_data[i * JSIZE + j] = a[i][j];
+        }
+    }
+
+
+    for (int i = first_task; i < ISIZE; i+=3) {
+        for (int j = 0; j < JSIZE - 4; j++) {
+            sending_data[i*JSIZE+j] = sin(0.00001 * sending_data[(i - 3) * JSIZE + j + 4]);
+        }
+    }
+
+
+
+
+
+    if (ProcRank == 0) {
+        for (int i = first_task; i < ISIZE; i += 3) {
+            for (int j = 0; j < JSIZE - 4; j++) {
+                a[i][j] = sending_data[i*JSIZE+j];
+            }
+        }
+
+        for (int proc = 1; proc < ProcNum; ++proc) {
+            int task_per_proc_rec;
+            MPI_Recv(&task_per_proc_rec, sizeof(task_per_proc_rec), MPI_BYTE, proc, 1, MPI_COMM_WORLD, &stat);
+
+            double* buff = new double[task_per_proc_rec * JSIZE];
+            MPI_Recv(buff, task_per_proc_rec * JSIZE * sizeof(double), MPI_BYTE, proc, 1, MPI_COMM_WORLD, &stat);
+
+            first_task++;
+            for (int i = first_task; i < ISIZE; i += 3) {
+                for (int j = 0; j < JSIZE - 4; j++) {
+                    a[i][j] = buff[i*JSIZE+j];
+                }
+            }
+            delete[] buff;
+        }
+    }
+    else {
+        MPI_Send(&task_per_proc, sizeof(task_per_proc), MPI_BYTE, 0, 1, MPI_COMM_WORLD);
+        MPI_Send(sending_data, task_per_proc * JSIZE * sizeof(double), MPI_BYTE, 0, 1, MPI_COMM_WORLD);
+    }
+
+
+    delete[] sending_data;   
+
 }
 
 #ifdef VARIANT_2V
@@ -284,7 +284,7 @@ void save(int ProcRank, int ProcNum, int first_task, int last_task, double** a, 
     }
 }
 #else 
-void save(int ProcRank, int ProcNum, int first_task, int last_task, double ** a, MPI_Status& stat) {
+void save(int ProcRank, int ProcNum, int first_task, int last_task, double** a, MPI_Status& stat) {
     FILE* ff;
     int flag = 0;
 
@@ -304,7 +304,7 @@ void save(int ProcRank, int ProcNum, int first_task, int last_task, double ** a,
     }
     fclose(ff);
     std::cout << "From process " << ProcRank << ": data saved" << std::endl;
-    
+
     if (ProcRank != ProcNum - 1) {
         MPI_Send(&flag, sizeof(flag), MPI_BYTE, ProcRank + 1, 1, MPI_COMM_WORLD);
     }
