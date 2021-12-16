@@ -9,11 +9,11 @@
 //#define VARIANT_1B
 #define VARIANT_2V
 
-#define SAVE_DATA
+//#define SAVE_DATA
 
 
 #define ISIZE 1000
-#define JSIZE 1000
+#define JSIZE 2000
 
 
 void algorithm_0(int first_task, int last_task, double** a);
@@ -212,7 +212,7 @@ void algorithm_2V(int ProcRank, int ProcNum, double** a, MPI_Status& stat) {
     double* sending_data = new double[ISIZE * JSIZE];
 
 
-    for (int i = 0; i < JSIZE; i++) {
+    for (int i = 0; i < ISIZE; i++) {
         for (int j = 0; j < JSIZE; j++) {
             sending_data[i * JSIZE + j] = a[i][j];
         }
@@ -221,7 +221,7 @@ void algorithm_2V(int ProcRank, int ProcNum, double** a, MPI_Status& stat) {
 
     for (int i = first_task; i < ISIZE; i+=3) {
         for (int j = 0; j < JSIZE - 4; j++) {
-            sending_data[i*JSIZE+j] = sin(0.00001 * sending_data[(i - 3) * JSIZE + j + 4]);
+            sending_data[i * JSIZE + j] = sin(0.00001 * sending_data[(i - 3) * JSIZE + j + 4]);
         }
     }
 
@@ -232,7 +232,8 @@ void algorithm_2V(int ProcRank, int ProcNum, double** a, MPI_Status& stat) {
     if (ProcRank == 0) {
         for (int i = first_task; i < ISIZE; i += 3) {
             for (int j = 0; j < JSIZE - 4; j++) {
-                a[i][j] = sending_data[i*JSIZE+j];
+                a[i][j] = sending_data[i * JSIZE + j];
+                
             }
         }
 
